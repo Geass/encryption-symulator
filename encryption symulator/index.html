@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symulator Szyfrowania Tekstu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Symulator Szyfrowania Tekstu</h1>
+    <div class="container">
+        <form id="encryption-form">
+            <label for="algorithm">Wybierz algorytm:</label>
+            <select id="algorithm" required>
+                <option value="">-- Wybierz --</option>
+                <option value="caesar">Szyfr Cezara</option>
+                <option value="vigenere">Szyfr Vigenère’a</option>
+                <option value="base64">Base64</option>
+            </select>
+
+            <label for="text">Tekst do zaszyfrowania/odszyfrowania:</label>
+            <textarea id="text" rows="4" required></textarea>
+
+            <label for="key">Klucz (jeśli wymagany):</label>
+            <input type="text" id="key">
+
+            <button type="button" id="encrypt-btn">Zaszyfruj</button>
+            <button type="button" id="decrypt-btn">Odszyfruj</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.getElementById('encrypt-btn').addEventListener('click', () => {
+            handleRequest('encrypt');
+        });
+
+        document.getElementById('decrypt-btn').addEventListener('click', () => {
+            handleRequest('decrypt');
+        });
+
+        async function handleRequest(action) {
+            const algorithm = document.getElementById('algorithm').value;
+            const text = document.getElementById('text').value;
+            const key = document.getElementById('key').value;
+
+            if (!algorithm || !text) {
+                alert('Proszę wypełnić wszystkie wymagane pola.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        algorithm,
+                        text,
+                        key
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('result');
+                resultDiv.style.display = 'block';
+                resultDiv.textContent = data.result;
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Wystąpił problem z połączeniem z serwerem. Upewnij się, że backend działa.');
+            }
+        }
+    </script>
+</body>
+</html>

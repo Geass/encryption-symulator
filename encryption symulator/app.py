@@ -17,6 +17,14 @@ def caesar_encrypt(text, shift):
 def caesar_decrypt(text, shift):
     return caesar_encrypt(text, -shift)
 
+
+def parse_caesar_shift(key):
+    """Return a numeric shift for the Caesar cipher, defaulting to 0 on failure."""
+    try:
+        return int(key)
+    except (TypeError, ValueError):
+        return 0
+
 def vigenere_encrypt(text, key):
     encrypted = ""
     key = key.lower()
@@ -67,7 +75,7 @@ def encrypt():
     key = data.get('key', '')
     
     if algorithm == 'caesar':
-        shift = int(key) if key.isdigit() else 0
+        shift = parse_caesar_shift(key)
         result = caesar_encrypt(text, shift)
     elif algorithm == 'vigenere':
         result = vigenere_encrypt(text, key)
@@ -86,7 +94,7 @@ def decrypt():
     key = data.get('key', '')
 
     if algorithm == 'caesar':
-        shift = int(key) if key.isdigit() else 0
+        shift = parse_caesar_shift(key)
         result = caesar_decrypt(text, shift)
     elif algorithm == 'vigenere':
         result = vigenere_decrypt(text, key)
